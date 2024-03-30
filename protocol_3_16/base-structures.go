@@ -2,7 +2,7 @@ package protocol
 
 import (
 	"encoding/json"
-	"strings"
+	"slices"
 	"unicode/utf8"
 )
 
@@ -52,7 +52,7 @@ type Position struct {
 	Character UInteger `json:"character"`
 }
 
-func (self Position) IndexIn(content string) int {
+func (self Position) IndexIn(content []byte) int {
 	// This code is modified from the gopls implementation found:
 	// https://cs.opensource.google/go/x/tools/+/refs/tags/v0.1.5:internal/span/utf16.go;l=70
 
@@ -65,7 +65,7 @@ func (self Position) IndexIn(content string) int {
 	index := 0
 	for row := UInteger(0); row < self.Line; row++ {
 		content_ := content[index:]
-		if next := strings.Index(content_, "\n"); next != -1 {
+		if next := slices.Index(content_, '\n'); next != -1 {
 			index += next + 1
 		} else {
 			return 0
@@ -87,7 +87,7 @@ func (self Position) IndexIn(content string) int {
 			return 0
 		}
 
-		r, w := utf8.DecodeRuneInString(remains)
+		r, w := utf8.DecodeRune(remains)
 		if r == '\n' {
 			// Per the LSP spec:
 			//
@@ -112,10 +112,10 @@ func (self Position) IndexIn(content string) int {
 	return byteOffset
 }
 
-func (self Position) EndOfLineIn(content string) Position {
+func (self Position) EndOfLineIn(content []byte) Position {
 	index := self.IndexIn(content)
 	content_ := content[index:]
-	if eol := strings.Index(content_, "\n"); eol != -1 {
+	if eol := slices.Index(content_, '\n'); eol != -1 {
 		return Position{
 			Line:      self.Line,
 			Character: self.Character + UInteger(eol),
@@ -139,7 +139,7 @@ type Range struct {
 	End Position `json:"end"`
 }
 
-func (self Range) IndexesIn(content string) (int, int) {
+func (self Range) IndexesIn(content []byte) (int, int) {
 	return self.Start.IndexIn(content), self.End.IndexIn(content)
 }
 

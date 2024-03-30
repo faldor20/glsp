@@ -3,6 +3,7 @@ package server
 import (
 	"time"
 
+	"github.com/sourcegraph/jsonrpc2"
 	"github.com/tliron/commonlog"
 	"github.com/tliron/glsp"
 )
@@ -17,6 +18,7 @@ type Server struct {
 	Handler     glsp.Handler
 	LogBaseName string
 	Debug       bool
+	Connection  *jsonrpc2.Conn
 
 	Log              commonlog.Logger
 	Timeout          time.Duration

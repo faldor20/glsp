@@ -12,6 +12,7 @@ import (
 
 func (self *Server) newHandler() jsonrpc2.Handler {
 	return jsonrpc2.HandlerWithError(self.handle)
+
 }
 
 func (self *Server) handle(context contextpkg.Context, connection *jsonrpc2.Conn, request *jsonrpc2.Request) (any, error) {
@@ -27,7 +28,9 @@ func (self *Server) handle(context contextpkg.Context, connection *jsonrpc2.Conn
 				self.Log.Error(err.Error())
 			}
 		},
-		Context: context,
+		ID:           request.ID,
+		Notification: request.Notif,
+		Context:      context,
 	}
 
 	if request.Params != nil {
